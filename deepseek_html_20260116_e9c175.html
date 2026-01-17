@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>化学版胡萝卜纸巾游戏 - 最终优化版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+            max-height: 900px;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .header h1 i {
+            color: #FFD700;
+        }
+        
+        .header p {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+        
+        .customize-area {
+            background-color: #f0f7ff;
+            padding: 12px 25px;
+            border-bottom: 1px dashed #cce0ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        
+        .upload-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .upload-label {
+            background-color: #4b6cb7;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-label:hover {
+            background-color: #3a5ca9;
+            transform: translateY(-2px);
+        }
+        
+        #image-upload {
+            display: none;
+        }
+        
+        .reset-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .reset-btn:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .image-preview {
+            font-size: 0.85rem;
+            color: #4b6cb7;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .main-game-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .left-panel {
+            flex: 1;
+            padding-right: 20px;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .question-container {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 3px solid #e9ecef;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 120px;
+        }
+        
+        .question {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #4b6cb7;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            word-break: break-word;
+            line-height: 1.2;
+        }
+        
+        .options-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .option {
+            background-color: white;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 18px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 70px;
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+        
+        .option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-color: #4b6cb7;
+        }
+        
+        .right-panel {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        
+        .cat-container {
+            height: 250px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        
+        .cat-image-container {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            overflow: hidden;
+            position: relative;
+            border: 5px solid #FFB347;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #cat-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .default-cat-icon {
+            font-size: 6rem;
+            color: #FFB347;
+        }
+        
+        .cat-paw {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: #FFB347;
+            border-radius: 50%;
+            top: 50px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: white;
+            z-index: 10;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .cat-paw.left {
+            left: 10px;
+            transform: rotate(15deg);
+        }
+        
+        .cat-paw.right {
+            right: 10px;
+            transform: rotate(-15deg);
+        }
+        
+        .expression-overlay {
+            position: absolute;
+            bottom: 30px;
+            width: 200px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            padding: 0 20px;
+            border: 2px solid #FFB347;
+        }
+        
+        .expression-text {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .feedback-container {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px 20px;
+            text-align: center;
+            border: 3px solid #e9ecef;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            flex-shrink: 0;
+            min-height: 130px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .game-end .feedback-container {
+            padding: 10px 15px;
+            min-height: 110px;
+        }
+        
+        .feedback {
+            font-size: 2rem;
+            font-weight: bold;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            line-height: 1.3;
+            word-break: break-word;
+        }
+        
+        .game-end .feedback {
+            font-size: 1.6rem;
+            min-height: 40px;
+            margin-bottom: 5px;
+        }
+        
+        .correct-feedback {
+            color: #2ecc71;
+        }
+        
+        .incorrect-feedback {
+            color: #e74c3c;
+        }
+        
+        .stats {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            flex-shrink: 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .stat {
+            text-align: center;
+            background-color: white;
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #4b6cb7;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .progress-container {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            width: 10%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .timer-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            margin-top: 10px;
+        }
+        
+        .timer-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        .timer-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .cat-background {
+            position: absolute;
+            opacity: 0.05;
+            z-index: 0;
+            font-size: 6rem;
+            color: #4b6cb7;
+        }
+        
+        .cat-background-1 {
+            top: 150px;
+            left: 30px;
+            transform: rotate(-15deg);
+        }
+        
+        .cat-background-2 {
+            bottom: 100px;
+            right: 40px;
+            transform: rotate(15deg);
+        }
+        
+        .cat-background-3 {
+            top: 300px;
+            right: 100px;
+            transform: rotate(25deg);
+        }
+        
+        .correct {
+            border-color: #2ecc71;
+            background-color: rgba(46, 204, 113, 0.1);
+        }
+        
+        .incorrect {
+            border-color: #e74c3c;
+            background-color: rgba(231, 76, 60, 0.1);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #6c757d;
+            font-size: 0.8rem;
+            border-top: 1px solid #e9ecef;
+            flex-shrink: 0;
+        }
+        
+        .auto-next-notice {
+            font-size: 0.9rem;
+            color: #4b6cb7;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        .hint {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        @media (max-width: 900px) {
+            .container {
+                height: auto;
+                max-height: none;
+            }
+            
+            .main-game-area {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                padding-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .right-panel {
+                width: 100%;
+            }
+            
+            .cat-container {
+                height: 200px;
+            }
+            
+            .cat-image-container {
+                width: 180px;
+                height: 180px;
+            }
+            
+            .question {
+                font-size: 2.5rem;
+            }
+            
+            .feedback-container {
+                min-height: 120px;
+            }
+            
+            .game-end .feedback-container {
+                min-height: 100px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .question {
+                font-size: 2rem;
+            }
+            
+            .option {
+                font-size: 1.1rem;
+                padding: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .customize-area {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .feedback {
+                font-size: 1.7rem;
+            }
+            
+            .game-end .feedback {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 小猫背景图案 -->
+        <div class="cat-background cat-background-1">
+            <i class="fas fa-cat"></i>
+        </div>
+        <div class="cat-background cat-background-2">
+            <i class="fas fa-cat"></i>
+        </div>
+        <div class="cat-background cat-background-3">
+            <i class="fas fa-cat"></i>
+        </div>
+        
+        <!-- 游戏头部 -->
+        <div class="header">
+            <h1><i class="fas fa-flask"></i> 化学版胡萝卜纸巾游戏 <i class="fas fa-paw"></i></h1>
+            <p>选择正确的化学物质对应俗称，自定义你的小猫助手！</p>
+        </div>
+        
+        <!-- 自定义区域 -->
+        <div class="customize-area">
+            <div class="upload-container">
+                <label for="image-upload" class="upload-label">
+                    <i class="fas fa-upload"></i> 上传小猫图片
+                </label>
+                <input type="file" id="image-upload" accept="image/*">
+                <button class="reset-btn" id="reset-btn">
+                    <i class="fas fa-redo"></i> 恢复默认
+                </button>
+            </div>
+            <div class="image-preview" id="image-preview">
+                当前使用默认小猫图片
+            </div>
+        </div>
+        
+        <!-- 主游戏区域 -->
+        <div class="main-game-area">
+            <!-- 左侧：题目和选项 -->
+            <div class="left-panel">
+                <div class="question-container">
+                    <div class="question" id="current-question">烧碱</div>
+                </div>
+                
+                <div class="options-container" id="options-container">
+                    <!-- 选项将由JavaScript动态生成 -->
+                </div>
+            </div>
+            
+            <!-- 右侧：小猫反馈和统计 -->
+            <div class="right-panel">
+                <!-- 小猫反馈区域 -->
+                <div class="cat-container">
+                    <div class="cat-image-container">
+                        <!-- 默认小猫图标 -->
+                        <div class="default-cat-icon" id="default-cat-icon">
+                            <i class="fas fa-cat"></i>
+                        </div>
+                        <!-- 用户上传的图片将显示在这里 -->
+                        <img id="cat-image" src="" alt="用户上传的小猫图片" style="display: none;">
+                    </div>
+                    <!-- 小猫爪子（用于正确反馈） -->
+                    <div class="cat-paw left" id="left-paw">
+                        <i class="fas fa-paw"></i>
+                    </div>
+                    <div class="cat-paw right" id="right-paw">
+                        <i class="fas fa-paw"></i>
+                    </div>
+                    <!-- 表情文字叠加层 -->
+                    <div class="expression-overlay">
+                        <div class="expression-text" id="expression-text">^_^</div>
+                    </div>
+                </div>
+                
+                <!-- 反馈区域 -->
+                <div class="feedback-container">
+                    <div class="feedback" id="feedback">
+                        请选择一个选项
+                    </div>
+                    <div class="auto-next-notice" id="auto-next-notice">
+                        答对后将自动进入下一题
+                    </div>
+                    <div class="hint" id="hint">
+                        答错后可以继续选择，直到答对为止
+                    </div>
+                </div>
+                
+                <!-- 游戏统计 -->
+                <div class="stats">
+                    <div class="stats-grid">
+                        <div class="stat">
+                            <div class="stat-value" id="score">0</div>
+                            <div class="stat-label">得分</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="correct-count">0</div>
+                            <div class="stat-label">正确</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="incorrect-count">0</div>
+                            <div class="stat-label">错误</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="questions-count">1/18</div>
+                            <div class="stat-label">进度</div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <div class="progress-text" id="progress-text">第1题，共18题</div>
+                    </div>
+                    
+                    <!-- 计时器 -->
+                    <div class="timer-container">
+                        <div class="timer-value" id="timer-value">00:00</div>
+                        <div class="timer-label">游戏时间</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 页脚 -->
+        <div class="footer">
+            <p>化学版胡萝卜纸巾游戏 - 支持上传多种图片格式（最大10MB） | 题目随机不重复 | 答对自动进入下一题</p>
+        </div>
+    </div>
+
+    <script>
+        // 化学题目数据（共18题）
+        const allQuestions = [
+            // 原有题目
+            {
+                name: "烧碱",
+                options: [
+                    { text: "氢氧化钙 (Ca(OH)₂)", correct: false },
+                    { text: "氢氧化钠 (NaOH)", correct: true }
+                ]
+            },
+            {
+                name: "纯碱",
+                options: [
+                    { text: "碳酸氢钠 (NaHCO₃)", correct: false },
+                    { text: "碳酸钠 (Na₂CO₃)", correct: true }
+                ]
+            },
+            {
+                name: "小苏打",
+                options: [
+                    { text: "碳酸钠 (Na₂CO₃)", correct: false },
+                    { text: "碳酸氢钠 (NaHCO₃)", correct: true }
+                ]
+            },
+            {
+                name: "熟石灰",
+                options: [
+                    { text: "氧化钙 (CaO)", correct: false },
+                    { text: "氢氧化钙 (Ca(OH)₂)", correct: true }
+                ]
+            },
+            {
+                name: "生石灰",
+                options: [
+                    { text: "氢氧化钙 (Ca(OH)₂)", correct: false },
+                    { text: "氧化钙 (CaO)", correct: true }
+                ]
+            },
+            {
+                name: "干冰",
+                options: [
+                    { text: "冰 (H₂O)", correct: false },
+                    { text: "二氧化碳 (CO₂)", correct: true }
+                ]
+            },
+            {
+                name: "水",
+                options: [
+                    { text: "H₂O₂", correct: false },
+                    { text: "H₂O", correct: true }
+                ]
+            },
+            {
+                name: "氧气",
+                options: [
+                    { text: "O₃", correct: false },
+                    { text: "O₂", correct: true }
+                ]
+            },
+            {
+                name: "二氧化碳",
+                options: [
+                    { text: "CO", correct: false },
+                    { text: "CO₂", correct: true }
+                ]
+            },
+            {
+                name: "硫酸",
+                options: [
+                    { text: "H₂SO₃", correct: false },
+                    { text: "H₂SO₄", correct: true }
+                ]
+            },
+            // 新增题目
+            {
+                name: "酒精",
+                options: [
+                    { text: "甲醇 (CH₃OH)", correct: false },
+                    { text: "乙醇 (C₂H₅OH)", correct: true }
+                ]
+            },
+            {
+                name: "天然气的主要成分",
+                options: [
+                    { text: "一氧化碳 (CO)", correct: false },
+                    { text: "甲烷 (CH₄)", correct: true }
+                ]
+            },
+            {
+                name: "“3H”表示",
+                options: [
+                    { text: "三个氢分子", correct: false },
+                    { text: "三个氢原子", correct: true }
+                ]
+            },
+            {
+                name: "“过滤”操作中玻璃棒的作用",
+                options: [
+                    { text: "搅拌加速溶解", correct: false },
+                    { text: "引流", correct: true }
+                ]
+            },
+            {
+                name: "浓硫酸稀释的正确操作",
+                options: [
+                    { text: "水入酸，慢倒缓搅", correct: false },
+                    { text: "酸入水，慢倒缓搅", correct: true }
+                ]
+            },
+            {
+                name: "氧气验满",
+                options: [
+                    { text: "将带火星木条伸入瓶内", correct: false },
+                    { text: "将带火星木条放在瓶口", correct: true }
+                ]
+            },
+            {
+                name: "单质",
+                options: [
+                    { text: "水", correct: false },
+                    { text: "氧气", correct: true }
+                ]
+            },
+            {
+                name: "碱性溶液使",
+                options: [
+                    { text: "石蕊变红", correct: false },
+                    { text: "酚酞变红", correct: true }
+                ]
+            }
+        ];
+
+        // 游戏状态变量
+        let availableQuestions = [];
+        let score = 0;
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let customImageUrl = null;
+        let autoNextTimeout = null;
+        let currentQuestionAnswered = false;
+        let selectedOptions = new Set();
+        let gameTimer = null;
+        let elapsedSeconds = 0;
+        
+        // DOM元素
+        const currentQuestionElement = document.getElementById('current-question');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackElement = document.getElementById('feedback');
+        const scoreElement = document.getElementById('score');
+        const correctCountElement = document.getElementById('correct-count');
+        const incorrectCountElement = document.getElementById('incorrect-count');
+        const questionsCountElement = document.getElementById('questions-count');
+        const leftPawElement = document.getElementById('left-paw');
+        const rightPawElement = document.getElementById('right-paw');
+        const expressionTextElement = document.getElementById('expression-text');
+        const imageUploadElement = document.getElementById('image-upload');
+        const resetButton = document.getElementById('reset-btn');
+        const catImageElement = document.getElementById('cat-image');
+        const defaultCatIconElement = document.getElementById('default-cat-icon');
+        const imagePreviewElement = document.getElementById('image-preview');
+        const progressFillElement = document.getElementById('progress-fill');
+        const progressTextElement = document.getElementById('progress-text');
+        const autoNextNoticeElement = document.getElementById('auto-next-notice');
+        const hintElement = document.getElementById('hint');
+        const timerValueElement = document.getElementById('timer-value');
+        const containerElement = document.querySelector('.container');
+        
+        // 初始化游戏
+        function initGame() {
+            // 重置游戏状态
+            score = 0;
+            correctCount = 0;
+            incorrectCount = 0;
+            currentQuestionAnswered = false;
+            selectedOptions.clear();
+            
+            // 移除游戏结束样式
+            containerElement.classList.remove('game-end');
+            
+            // 重置可用题目列表（深拷贝）
+            availableQuestions = [...allQuestions];
+            
+            // 重置计时器
+            elapsedSeconds = 0;
+            updateTimerDisplay();
+            if (gameTimer) {
+                clearInterval(gameTimer);
+            }
+            gameTimer = setInterval(updateTimer, 1000);
+            
+            // 更新统计信息
+            updateStats();
+            updateProgress();
+            
+            // 加载第一题
+            loadRandomQuestion();
+            
+            // 重置小猫状态
+            resetCatExpression();
+        }
+        
+        // 加载随机题目
+        function loadRandomQuestion() {
+            // 清除之前的自动跳转定时器
+            if (autoNextTimeout) {
+                clearTimeout(autoNextTimeout);
+                autoNextTimeout = null;
+            }
+            
+            // 移除游戏结束样式
+            containerElement.classList.remove('game-end');
+            
+            // 重置当前题目状态
+            currentQuestionAnswered = false;
+            selectedOptions.clear();
+            feedbackElement.textContent = "请选择一个选项";
+            feedbackElement.className = "feedback";
+            autoNextNoticeElement.textContent = "答对后将自动进入下一题";
+            autoNextNoticeElement.style.color = "#4b6cb7";
+            hintElement.style.display = "block";
+            
+            // 重置小猫状态
+            resetCatExpression();
+            
+            // 如果没有可用题目了，结束游戏
+            if (availableQuestions.length === 0) {
+                endGame();
+                return;
+            }
+            
+            // 随机选择一个题目
+            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+            const currentQuestion = availableQuestions[randomIndex];
+            
+            // 从可用题目中移除已选择的题目
+            availableQuestions.splice(randomIndex, 1);
+            
+            // 设置当前题目
+            currentQuestionElement.textContent = currentQuestion.name;
+            
+            // 清空选项容器
+            optionsContainer.innerHTML = '';
+            
+            // 随机排序选项
+            const shuffledOptions = [...currentQuestion.options].sort(() => Math.random() - 0.5);
+            
+            // 创建选项按钮
+            shuffledOptions.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option.text;
+                optionElement.dataset.correct = option.correct;
+                optionElement.dataset.optionId = index;
+                
+                optionElement.addEventListener('click', () => selectOption(optionElement));
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            // 更新进度
+            updateProgress();
+        }
+        
+        // 选择选项
+        function selectOption(selectedOption) {
+            // 如果当前题目已经答对，不再处理选择
+            if (currentQuestionAnswered) return;
+            
+            const optionId = selectedOption.dataset.optionId;
+            const isCorrect = selectedOption.dataset.correct === 'true';
+            
+            // 标记已选择的选项
+            selectedOptions.add(optionId);
+            
+            // 显示选中效果
+            if (isCorrect) {
+                selectedOption.classList.add('correct');
+            } else {
+                selectedOption.classList.add('incorrect');
+            }
+            
+            // 判断是否正确
+            if (isCorrect) {
+                // 答对的情况
+                score += 10;
+                correctCount++;
+                feedbackElement.textContent = "真棒！";
+                feedbackElement.className = "feedback correct-feedback";
+                
+                // 小猫高兴：举爪和笑脸
+                leftPawElement.style.opacity = "1";
+                rightPawElement.style.opacity = "1";
+                expressionTextElement.textContent = "✧◝(⁰▿⁰)◜✧";
+                
+                // 标记当前题目已答对
+                currentQuestionAnswered = true;
+                
+                // 自动进入下一题（1秒后）
+                autoNextNoticeElement.textContent = "即将自动进入下一题...";
+                autoNextNoticeElement.style.color = "#2ecc71";
+                hintElement.style.display = "none";
+                autoNextTimeout = setTimeout(() => {
+                    loadRandomQuestion();
+                }, 1000);
+            } else {
+                // 答错的情况
+                incorrectCount++;
+                feedbackElement.textContent = "再来！";
+                feedbackElement.className = "feedback incorrect-feedback";
+                
+                // 小猫失望：不举爪和沮丧表情
+                expressionTextElement.textContent = "(；´д｀)ゞ";
+                
+                // 提示可以继续选择
+                autoNextNoticeElement.textContent = "请选择其他选项";
+                autoNextNoticeElement.style.color = "#e74c3c";
+            }
+            
+            updateStats();
+        }
+        
+        // 重置小猫表情
+        function resetCatExpression() {
+            leftPawElement.style.opacity = "0";
+            rightPawElement.style.opacity = "0";
+            expressionTextElement.textContent = "^_^";
+        }
+        
+        // 更新统计信息
+        function updateStats() {
+            const totalQuestions = allQuestions.length;
+            const answeredQuestions = totalQuestions - availableQuestions.length;
+            
+            scoreElement.textContent = score;
+            correctCountElement.textContent = correctCount;
+            incorrectCountElement.textContent = incorrectCount;
+            questionsCountElement.textContent = `${answeredQuestions}/${totalQuestions}`;
+        }
+        
+        // 更新进度条
+        function updateProgress() {
+            const totalQuestions = allQuestions.length;
+            const answeredQuestions = totalQuestions - availableQuestions.length;
+            const progressPercentage = (answeredQuestions / totalQuestions) * 100;
+            
+            progressFillElement.style.width = `${progressPercentage}%`;
+            progressTextElement.textContent = `第${answeredQuestions}题，共${totalQuestions}题`;
+        }
+        
+        // 更新计时器
+        function updateTimer() {
+            elapsedSeconds++;
+            updateTimerDisplay();
+        }
+        
+        // 更新计时器显示
+        function updateTimerDisplay() {
+            const minutes = Math.floor(elapsedSeconds / 60);
+            const seconds = elapsedSeconds % 60;
+            timerValueElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        // 游戏结束
+        function endGame() {
+            // 停止计时器
+            if (gameTimer) {
+                clearInterval(gameTimer);
+                gameTimer = null;
+            }
+            
+            // 添加游戏结束样式
+            containerElement.classList.add('game-end');
+            
+            currentQuestionElement.textContent = "游戏结束！";
+            optionsContainer.innerHTML = '<div class="option" style="pointer-events: none; background-color: #f8f9fa;">所有题目已完成！</div>';
+            
+            // 计算最终得分并显示完整信息
+            const finalScoreText = `你的最终得分: ${score}分`;
+            const catReactionText = score >= allQuestions.length * 10 * 0.7 ? "小猫为你骄傲！" : "继续加油哦！";
+            feedbackElement.textContent = `${finalScoreText} ${catReactionText}`;
+            feedbackElement.className = "feedback";
+            
+            // 小猫最终状态
+            if (score >= allQuestions.length * 10 * 0.7) { // 70%以上正确
+                leftPawElement.style.opacity = "1";
+                rightPawElement.style.opacity = "1";
+                expressionTextElement.textContent = "✧◝(⁰▿⁰)◜✧";
+            } else {
+                expressionTextElement.textContent = "´･ᴗ･`";
+            }
+            
+            autoNextNoticeElement.textContent = "点击刷新页面重新开始游戏";
+            autoNextNoticeElement.style.color = "#4b6cb7";
+            autoNextNoticeElement.style.cursor = "pointer";
+            hintElement.style.display = "none";
+            autoNextNoticeElement.onclick = () => location.reload();
+        }
+        
+        // 图片上传处理
+        imageUploadElement.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // 检查文件类型
+            if (!file.type.match('image.*')) {
+                alert('请上传图片格式的文件！');
+                return;
+            }
+            
+            // 检查文件大小（限制为10MB）
+            if (file.size > 10 * 1024 * 1024) {
+                alert('图片大小不能超过10MB！');
+                return;
+            }
+            
+            // 创建文件读取器
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                // 保存图片URL
+                customImageUrl = e.target.result;
+                
+                // 显示用户上传的图片
+                catImageElement.src = customImageUrl;
+                catImageElement.style.display = 'block';
+                defaultCatIconElement.style.display = 'none';
+                
+                // 更新预览信息
+                const fileName = file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name;
+                imagePreviewElement.textContent = `当前图片: ${fileName}`;
+                imagePreviewElement.title = file.name;
+                
+                // 保存到本地存储
+                try {
+                    localStorage.setItem('catGameCustomImage', customImageUrl);
+                    localStorage.setItem('catGameImageName', file.name);
+                } catch (e) {
+                    console.log('本地存储失败，但图片已加载');
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        });
+        
+        // 恢复默认图片
+        resetButton.addEventListener('click', function() {
+            // 移除自定义图片
+            customImageUrl = null;
+            catImageElement.src = '';
+            catImageElement.style.display = 'none';
+            defaultCatIconElement.style.display = 'flex';
+            
+            // 更新预览信息
+            imagePreviewElement.textContent = '当前使用默认小猫图片';
+            
+            // 清除本地存储
+            try {
+                localStorage.removeItem('catGameCustomImage');
+                localStorage.removeItem('catGameImageName');
+            } catch (e) {
+                console.log('清除本地存储失败');
+            }
+        });
+        
+        // 检查本地存储中是否有保存的图片
+        function loadSavedImage() {
+            try {
+                const savedImage = localStorage.getItem('catGameCustomImage');
+                const savedName = localStorage.getItem('catGameImageName');
+                
+                if (savedImage) {
+                    customImageUrl = savedImage;
+                    catImageElement.src = customImageUrl;
+                    catImageElement.style.display = 'block';
+                    defaultCatIconElement.style.display = 'none';
+                    
+                    const displayName = savedName && savedName.length > 20 
+                        ? savedName.substring(0, 20) + '...' 
+                        : savedName || '已保存的图片';
+                    imagePreviewElement.textContent = `当前图片: ${displayName}`;
+                }
+            } catch (e) {
+                console.log('加载保存的图片失败');
+            }
+        }
+        
+        // 初始化游戏和加载保存的图片
+        window.addEventListener('DOMContentLoaded', function() {
+            initGame();
+            loadSavedImage();
+        });
+        
+        // 添加一些动画效果
+        document.addEventListener('DOMContentLoaded', function() {
+            // 小猫爪子轻微动画
+            setInterval(() => {
+                if (leftPawElement.style.opacity === "1") {
+                    leftPawElement.style.transform = `rotate(${15 + Math.random() * 10}deg)`;
+                    rightPawElement.style.transform = `rotate(${-15 - Math.random() * 10}deg)`;
+                }
+            }, 800);
+        });
+    </script>
+</body>
+</html>
